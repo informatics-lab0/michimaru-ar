@@ -16,24 +16,34 @@
     <a-scene
       embedded
       vr-mode-ui="enabled: false"
-      renderer="colorManagement: true; physicallyCorrectLights: true"
-      arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
+      renderer="colorManagement: true; physicallyCorrectLights: true; precision: mediump;"
+      arjs="trackingMethod: best;
+            sourceType: webcam;
+            facingMode: environment;
+            sourceWidth: 1280;
+            sourceHeight: 720;
+            displayWidth: 1280;
+            displayHeight: 720;
+            debugUIEnabled: false;"
     >
       <!-- 画像アセットの事前読込 -->
-      <a-assets>
-        <img id="illust" src="illustration.png" crossorigin="anonymous" />
+      <a-assets timeout="10000">
+        <img id="illust" src="illustration.png" />
       </a-assets>
 
       <!-- パターンマーカー（marker.patt）に反応 -->
       <a-marker type="pattern" url="marker.patt">
-        <!-- PNGイラストを平面として表示 -->
+        <!-- ① マーカー認識の切り分け：赤い箱が出るか -->
+        <a-box position="0 0.5 0" depth="0.5" height="0.5" width="0.5" color="#E74C3C"></a-box>
+
+        <!-- ② PNG（少し浮かせ、透明・両面・フラット） -->
         <a-plane
           src="#illust"
-          position="0 0 0"
+          position="0 0.01 0"
           rotation="-90 0 0"
-          width="1"
-          height="1"
-          material="transparent: true; side: double"
+          width="1.5"
+          height="1.5"
+          material="shader: flat; transparent: true; side: double; alphaTest: 0.01"
         ></a-plane>
       </a-marker>
 
