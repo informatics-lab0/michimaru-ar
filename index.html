@@ -1,54 +1,80 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>AR.js マーカー型デモ</title>
-    <!-- A-Frame 本体 -->
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-    <!-- AR.js（A-Frame 版：パターンマーカー用） -->
-    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Location Based AR - Multi Media</title>
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+    <script src="https://unpkg.com/aframe-look-at-component@0.8.0/dist/aframe-look-at-component.min.js"></script>
+    
     <style>
-      html, body { margin: 0; overflow: hidden; background: #000; }
+      #overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.7); color: white;
+        display: flex; align-items: center; justify-content: center;
+        z-index: 9999; cursor: pointer; text-align: center; font-family: sans-serif;
+      }
     </style>
   </head>
-  <body>
+
+  <body style="margin: 0; overflow: hidden;">
+    <div id="overlay">
+      <h1>AR体験を開始<br>画面をタップしてください</h1>
+    </div>
+
     <a-scene
-      embedded
       vr-mode-ui="enabled: false"
-      renderer="colorManagement: true; physicallyCorrectLights: true; precision: mediump;"
-      arjs="trackingMethod: best;
-            sourceType: webcam;
-            facingMode: environment;
-            sourceWidth: 1280;
-            sourceHeight: 720;
-            displayWidth: 1280;
-            displayHeight: 720;
-            debugUIEnabled: false;"
+      embedded
+      arjs="sourceType: webcam; debugUIEnabled: false;"
     >
-      <!-- 画像アセットの事前読込 -->
-      <a-assets timeout="10000">
-        <img id="illust" src="illustration.png" />
+      <a-assets>
+        <img id="my-png" src="your-image.png">
+        <video id="my-video" src="your-video.mp4" loop="true" crossorigin="anonymous" playsinline></video>
+        <audio id="my-audio" src="your-music.mp3" loop="true" crossorigin="anonymous"></audio>
       </a-assets>
 
-      <!-- パターンマーカー（marker.patt）に反応 -->
-      <a-marker type="pattern" url="marker.patt">
-        <!-- ① マーカー認識の切り分け：赤い箱が出るか -->
-        <a-box position="0 0.5 0" depth="0.5" height="0.5" width="0.5" color="#E74C3C"></a-box>
+      <a-image
+        src="#my-png"
+        look-at="[gps-camera]"
+        scale="10 10 10" 
+        gps-entity-place="latitude: 35.681236; longitude: 139.767125;"
+        position="0 5 0"
+      ></a-image>
 
-        <!-- ② PNG（少し浮かせ、透明・両面・フラット） -->
-        <a-plane
-          src="#illust"
-          position="0 0.01 0"
-          rotation="-90 0 0"
-          width="1.5"
-          height="1.5"
-          material="shader: flat; transparent: true; side: double; alphaTest: 0.01"
-        ></a-plane>
-      </a-marker>
+      <a-video
+        src="#my-video"
+        width="16" height="9"
+        gps-entity-place="latitude: 35.003536235450355; longitude: 138.43780845644258;"
+        position="0 10 0"
+      ></a-video>
 
-      <!-- カメラ -->
-      <a-entity camera></a-entity>
+      <a-entity
+        gps-entity-place="latitude: 35.681236; longitude: 139.767125;"
+        sound="src: #my-audio; autoplay: false; volume: 1; refDistance: 10; rolloffFactor: 5">
+      </a-entity>
+
+      <a-camera gps-camera rotation-reader></a-camera>
     </a-scene>
+
+    <script>
+      // 画面をタップした時に動画と音声を再生開始する
+      const overlay = document.getElementById('overlay');
+      overlay.addEventListener('click', () => {
+        // 動画の再生
+        const video = document.querySelector('#my-video');
+        if (video) video.play();
+
+        // 音楽の再生
+        const audioEntity = document.querySelector('[sound]');
+        if (audioEntity) {
+          // A-Frameのsoundコンポーネント経由で再生
+          audioEntity.components.sound.playSound();
+        }
+
+        // オーバーレイを消す
+        overlay.style.display = 'none';
+      });
+    </script>
   </body>
 </html>
